@@ -26,9 +26,9 @@ exports.handler = async (event) => {
     let params = {TableName: tableName, Limit: 5}, results = []
 
     if (event.studentLastName) {
-      params.IndexName = studentLastNameGsi
-      params.KeyConditionExpression = "studentLastname = :studentlastname"
-      params.ExpressionAttributeValues = { ":studentlastname": event.studentLastName }
+      params.IndexName = "studentLastNameGsi"
+      params.KeyConditionExpression = "studentLastName = :studentLastName"
+      params.ExpressionAttributeValues = { ":studentLastName": event.studentLastName }
     } else {
       params.KeyConditionExpression = "schoolId = :schoolId",
       params.ExpressionAttributeValues = {":schoolId": event.schoolId}
