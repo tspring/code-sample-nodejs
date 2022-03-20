@@ -1,12 +1,14 @@
-const AWS = require('aws-sdk');
+const DynamoDB = require('aws-sdk/clients/dynamodb')
 
-const dynamodb = new AWS.DynamoDB.DocumentClient({
-  apiVersion: '2012-08-10',
-  endpoint: new AWS.Endpoint('http://localhost:8000'),
-  region: 'us-west-2',
-  accessKeyId: "fakeMyKeyId",
-  secretAccessKey: "fakeSecretAccessKey"
-  // what could you do to improve performance?
+const dynamodb = new DynamoDB.DocumentClient({
+    apiVersion: '2012-08-10',
+    endpoint: 'http://localhost:8000',
+    region: 'us-west-2',
+    accessKeyId: 'fakeKeyId',
+    secretAccessKey: 'fakeSecretAccessKey'
+    // what could you do to improve performance?
+    // optimize imports by per: https://docs.aws.amazon.com/lambda/latest/operatorguide/static-initialization.html
+    // avoid dynamic function invocations in object construction per: https://iacoma.cs.uiuc.edu/iacoma-papers/pldi14.pdf
 });
 
 const tableName = 'SchoolStudents';
