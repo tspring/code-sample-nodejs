@@ -20,12 +20,24 @@ const studentLastNameGsiName = 'studentLastNameGsi';
  * @param {string} event.studentId
  * @param {string} [event.studentLastName]
  */
-exports.handler = (event) => {
-  // TODO use the AWS.DynamoDB.DocumentClient to write a query against the 'SchoolStudents' table and return the results.
+exports.handler = async (event) => {
   // The 'SchoolStudents' table key is composed of schoolId (partition key) and studentId (range key).
 
-  // TODO (extra credit) if event.studentLastName exists then query using the 'studentLastNameGsi' GSI and return the results.
+    let params = {
+        TableName: tableName,
+        KeyConditionExpression: "schoolId = :schoolId",
+        ExpressionAttributeValues: {":schoolId": event.schoolId}
+    }, results = [], entry = null
+
+    do {
+        entries = await dynamodb.query(params).promise()
+        // collect the results and advance the cursor
+        results.push(...entries.Items)
+        params.ExclusiveStartKey = entries.lastEvaluatedKey
+    } while(entries.lastEvaluatedKey);
+    return results
+// TODO (extra credit) if event.studentLastName exists then query using the 'studentLastNameGsi' GSI and return the results.
 
   // TODO (extra credit) limit the amount of records returned in the query to 5 and then implement the logic to return all
-  //  pages of records found by the query (uncomment the test which exercises this functionality)
+    //  pages of records found by the query (uncomment the test which exercises this functionality)
 };
