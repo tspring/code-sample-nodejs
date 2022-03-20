@@ -9,6 +9,19 @@ const dynamodb = new AWS.DynamoDB.DocumentClient({
 
 const tableName = 'SchoolStudents';
 
+const schema = {
+  schoolId: value => value && String(value),
+  schoolName: value => value && String(value),
+  studentId: value => value && String(value),
+  studentFirstName: value => value && String(value),
+  studentLastName: value => value && String(value),
+  studentGrade: value => value && String(value)
+}
+
+function validate(entry) {
+  return Object.keys(entry).length === 6 &&  Object.keys(schema).every(key => schema[key](entry[key]))
+}
+
 /**
  * The entry point into the lambda
  *
@@ -20,8 +33,28 @@ const tableName = 'SchoolStudents';
  * @param {string} event.studentLastName
  * @param {string} event.studentGrade
  */
-exports.handler = (event) => {
-  // TODO validate that all expected attributes are present (assume they are all required)
-  // TODO use the AWS.DynamoDB.DocumentClient to save the 'SchoolStudent' record
-  // The 'SchoolStudents' table key is composed of schoolId (partition key) and studentId (range key).
+exports.handler = async (event) => {
+    // The 'SchoolStudents' table key is composed of schoolId (partition key) and studentId (range key).
+    try {
+        let student = {
+            schoolId: event.schoolId,
+            schoolName: event.schoolName,
+            studentId: event.studentId,
+            studentFirstName: event.studentFirstName,
+            studentLastName: event.studentLastName,
+            studentGrade: event.studentGrade
+        };
+
+        if (!validate(event)) {
+            // TODO: handle invalid db entries
+            console.log('Invalid schema')
+        } else {
+            await dynamodb.put({TableName: tableName, Item: student}, (err, data) => {
+                if (err) console.log(`Error writing to dynamodb ${err}`)
+            }).promise();
+        }
+    } catch (error) {
+        //TODO:
+        console.log(error)
+    }
 };
