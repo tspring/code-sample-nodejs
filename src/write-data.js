@@ -12,18 +12,17 @@ const dynamodb = new AWS.DynamoDB.DocumentClient({
 const tableName = 'SchoolStudents';
 
 const schema = {
-  schoolId: value => value && String(value),
-  schoolName: value => value && String(value),
-  studentId: value => value && String(value),
-  studentFirstName: value => value && String(value),
-  studentLastName: value => value && String(value),
-  studentGrade: value => value && String(value)
+  schoolId: value => value && typeof(value) == 'string',
+  schoolName: value => value && typeof(value) == 'string',
+  studentId: value => value && typeof(value) == 'string',
+  studentFirstName: value => value && typeof(value) == 'string',
+  studentLastName: value => value && typeof(value) == 'string',
+  studentGrade: value => value && typeof(value) == 'string'
+
 }
 
 function validate(entry) {
-    return Object.keys(entry).length === 6
-        && Object.keys(schema).every(key => schema[key](entry[key]))
-        && Object.values(entry).every(value => typeof(value) === 'string' )
+    return Object.keys(schema).every(key => schema[key](entry[key]))
 }
 
 /**
