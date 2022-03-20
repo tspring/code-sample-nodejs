@@ -22,22 +22,31 @@ const studentLastNameGsiName = 'studentLastNameGsi';
  */
 exports.handler = async (event) => {
   // The 'SchoolStudents' table key is composed of schoolId (partition key) and studentId (range key).
+  try {
+    let params = {TableName: tableName, Limit: 5}, results = []
 
-    let params = {
-        TableName: tableName,
-        KeyConditionExpression: "schoolId = :schoolId",
-        ExpressionAttributeValues: {":schoolId": event.schoolId}
-    }, results = [], entry = null
+    if (event.studentLastName) {
+      params.IndexName = studentLastNameGsi
+      params.KeyConditionExpression = "studentLastname = :studentlastname"
+      params.ExpressionAttributeValues = { ":studentlastname": event.studentLastName }
+    } else {
+      params.KeyConditionExpression = "schoolId = :schoolId",
+      params.ExpressionAttributeValues = {":schoolId": event.schoolId}
+      if (event.studentId) {
+          params.KeyConditionExpression =  "schoolId = :schoolId and studentId = :studentId"
+          params.ExpressionAttributeValues[":studentId"] =  event.studentId
+        }
+    }
 
     do {
-        entries = await dynamodb.query(params).promise()
-        // collect the results and advance the cursor
-        results.push(...entries.Items)
-        params.ExclusiveStartKey = entries.lastEvaluatedKey
-    } while(entries.lastEvaluatedKey);
-    return results
-// TODO (extra credit) if event.studentLastName exists then query using the 'studentLastNameGsi' GSI and return the results.
+      entries = await dynamodb.query(params).promise()
+      // collect the results and advance the cursor
+      results.push(...entries.Items)
+      params.ExclusiveStartKey = entries.LastEvaluatedKey
+    } while(entries.LastEvaluatedKey);
 
-  // TODO (extra credit) limit the amount of records returned in the query to 5 and then implement the logic to return all
-    //  pages of records found by the query (uncomment the test which exercises this functionality)
+    return results
+  } catch (error) {
+      console.log(error)
+  }
 };
