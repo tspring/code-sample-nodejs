@@ -21,7 +21,9 @@ const schema = {
 }
 
 function validate(entry) {
-  return Object.keys(entry).length === 6 &&  Object.keys(schema).every(key => schema[key](entry[key]))
+    return Object.keys(entry).length === 6
+        && Object.keys(schema).every(key => schema[key](entry[key]))
+        && Object.values(entry).every(value => typeof(value) === 'string' )
 }
 
 /**

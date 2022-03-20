@@ -26,11 +26,42 @@ describe('the code sample', function () {
 
     await writeData.handler(schoolStudent);
 
+    // Test invalid entries
+    const studentNotAllStringValues = {
+      schoolId: schoolId,
+      schoolName: 'Code Sample Academy',
+      studentId: studentId,
+      studentFirstName: 'Jane',
+      studentLastName: 'Doe',
+      studentGrade: 8,
+    };
+    await writeData.handler(studentNotAllStringValues);
+
+    const studentMissingKey = {
+      schoolId: schoolId,
+      schoolName: 'Code Sample Academy',
+      studentId: studentId,
+      studentFirstName: 'Jane',
+      studentLastName: 'Doe',
+    };
+    await writeData.handler(studentMissingKey);
+
+    const studentIncorrectKey = {
+      invalidSchoolId: schoolId,
+      schoolName: 'Code Sample Academy',
+      studentId: studentId,
+      studentFirstName: 'Jane',
+      studentLastName: 'Doe',
+      studentGrade: '8',
+    };
+    await writeData.handler(studentIncorrectKey);
+
     const query = {
       schoolId: schoolId,
       studentId: studentId,
     };
     const queryResult = await readData.handler(query);
+
 
     assert.isTrue(Array.isArray(queryResult), 'Expected queryResult to be of type Array');
     assert.equal(queryResult.length, 1, 'Expected to find one result');
